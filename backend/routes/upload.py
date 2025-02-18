@@ -14,7 +14,9 @@ router = APIRouter()
 
 @router.post("/")
 def upload_document(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    print(filepath)
     
     with open(filepath, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)

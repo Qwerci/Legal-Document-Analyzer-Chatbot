@@ -33,14 +33,25 @@ def index_documents(db: Session):
         faiss_index.add(embeddings)
 
 
+
 def search_documents(query: str, top_k=5):
     """Find the most relevant legal documents using FAISS similarity search."""
     query_vector = generate_embedding(query).reshape(1, -1)
     distance, indices = faiss_index.search(query_vector, top_k)
-
+    
+    # Debug statements to check the shapes and lengths
+    print(f"distance shape: {distance.shape}")
+    print(f"indices shape: {indices.shape}")
+    print(f"document_ids length: {len(document_ids)}")
+    
     results = []
     for i, index in enumerate(indices[0]):
         if index < len(document_ids):
-            results.append({"document_id": document_ids[index], "score": distance[0][i]})
+            # Convert numpy.float32 to Python float before adding to results
+            score = float(distance[0][i])  # Ensure the score is a Python float
+            results.append({"document_id": document_ids[index], "score": score})
+        else:
+            print(f"Error: index {index} is out of range for document_ids list.")
     
     return results
+
